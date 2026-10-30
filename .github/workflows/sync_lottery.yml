@@ -1,0 +1,50 @@
+name: Sync Lottery Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'    # 每天北京时间 08:00 调用接口一 (types)
+    - cron: '30 13 * * *'  # 每天北京时间 21:30 (福彩21:15开奖后15分)
+    - cron: '40 13 * * *'  # 每天北京时间 21:40 (体彩21:25开奖后15分)
+    - cron: '45 13 * * *'  # 每天北京时间 21:45 (快乐8开奖后15分)
+  workflow_dispatch:        # 支持在网页上手动点按钮立即运行测试
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+
+      - name: 执行同步任务
+        env:
+          ROLL_APP_ID: ${{ secrets.ROLL_APP_ID }}
+          ROLL_APP_SECRET: ${{ secrets.ROLL_APP_SECRET }}
+          TZ: 'Asia/Shanghai'
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            python update_lottery.py all
+          elif [ "${{ github.event.schedule }}" == "0 0 * * *" ]; then
+            python update_lottery.py types
+          elif [ "${{ github.event.schedule }}" == "30 13 * * *" ]; then
+            python update_lottery.py 2130
+          elif [ "${{ github.event.schedule }}" == "40 13 * * *" ]; then
+            python update_lottery.py 2140
+          elif [ "${{ github.event.schedule }}" == "45 13 * * *" ]; then
+            python update_lottery.py 2145
+          fi
+
+      - name: 自动提交更新的 JSON 文件
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add data/*.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto sync lottery json" && git push)
