@@ -1,14 +1,21 @@
 {
   "code": "3d",
-  "updatedAt": "2026-11-08 02:08:06",
+  "updatedAt": "2026-11-09 02:25:28",
   "latest": {
-    "openCode": "1,2,3",
+    "openCode": "0,8,5",
     "code": "fc3d",
-    "expect": "2026297",
+    "expect": "2026298",
     "name": "福彩3D",
-    "time": "2026-11-07 21:15:00"
+    "time": "2026-11-08 21:15:00"
   },
   "data": [
+    {
+      "openCode": "0,8,5",
+      "code": "fc3d",
+      "expect": "2026298",
+      "name": "福彩3D",
+      "time": "2026-11-08 21:15:00"
+    },
     {
       "openCode": "1,2,3",
       "code": "fc3d",
